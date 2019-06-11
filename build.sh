@@ -148,12 +148,8 @@ git add main/php_version.h
 
 # Update configure.ac
 cd /workspace/php-src
-sed -i \
-    -e "s/^PHP_MAJOR_VERSION=[0-9]\+$/PHP_MAJOR_VERSION=$VERSION_MAJOR/g" \
-    -e "s/^PHP_MINOR_VERSION=[0-9]\+$/PHP_MINOR_VERSION=$VERSION_MINOR/g" \
-    -e "s/^PHP_RELEASE_VERSION=[0-9]\+$/PHP_RELEASE_VERSION=$VERSION_PATCH/g" \
-    -e "s/^PHP_EXTRA_VERSION=\".\+\"$/PHP_EXTRA_VERSION=\"$VERSION_EXTRA\"/g" \
-    "$CONFIGURE_AC"
+sed -e "s/^AC_INIT.*/AC_INIT(\[PHP\],\[$VERSION_MAJOR\.$VERSION_MINOR\.$VERSION_PATCH$VERSION_EXTRA\],\[https:\/\/bugs\.php\.net\],\[php\],\[https:\/\/www\.php\.net\])/g" \
+    < "$CONFIGURE_AC" > "$CONFIGURE_AC".tmp && mv "$CONFIGURE_AC".tmp "$CONFIGURE_AC"
 git add "$CONFIGURE_AC"
 
 # commit
@@ -219,7 +215,7 @@ cd /workspace/php-src
 echo "-----------------"
 echo "Bundling tarballs"
 git tag "php-$RELEASE_VERSION" "$TAG_COMMIT"
-PHPROOT=. ./makedist "$RELEASE_VERSION"
+PHPROOT=. ./scripts/dev/makedist "$RELEASE_VERSION"
 git tag -d "php-$RELEASE_VERSION"
 
 # Back off of release spur now that we've tagged
