@@ -154,7 +154,7 @@ git add "$CONFIGURE_AC"
 
 # commit
 cd /workspace/php-src
-git commit -m "Update versions for PHP ${RELEASE_VERSION}"
+git commit --allow-empty -m "Update versions for PHP ${RELEASE_VERSION}"
 git show | cat -
 TAG_COMMIT=$(git rev-parse HEAD)
 
@@ -175,11 +175,17 @@ make_test() {
   mkdir -p /workspace/log
   cd /workspace/php-src
   git clean -xfdq
+
+  # Patching out travis/compile's --enable-werror
+  cat travis/compile.sh | grep -v enable-werror > /workspace/travis-compile-patched.sh
+  chmod +x /workspace/travis-compile-patched.sh
+
   ENABLE_DEBUG=${1:?"DEBUG opt not specific"} \
   ENABLE_MAINTAINER_ZTS=${2:?"ZTS opt not specified"} \
   CONFIG_LOG_FILE=/workspace/log/config.$LOGEXT \
   MAKE_LOG_FILE=/workspace/log/make.$LOGEXT \
-    travis/compile.sh 2> /dev/null
+  MAKE_JOBS=$(nproc) \
+    /workspace/travis-compile-patched.sh 2>&1
   BUILT_VERSION=$(./sapi/cli/php -n -v | head -n 1 | cut -d " " -f 2)
   if [ "$BUILT_VERSION" != "$RELEASE_VERSION" ]; then
     echo "**Panic: RELEASE_VERSION=${RELEASE_VERSION}, but BUILT_VERSION=${BUILT_VERSION}"
@@ -215,7 +221,7 @@ cd /workspace/php-src
 echo "-----------------"
 echo "Bundling tarballs"
 git tag "php-$RELEASE_VERSION" "$TAG_COMMIT"
-PHPROOT=. ./scripts/dev/makedist "$RELEASE_VERSION"
+PHPROOT=. ./scripts/dev/makedist "php-$RELEASE_VERSION"
 git tag -d "php-$RELEASE_VERSION"
 
 # Back off of release spur now that we've tagged

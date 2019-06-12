@@ -13,7 +13,8 @@ RUN apt-get update && apt-get update --fix-missing && \
     apt-get install --yes build-essential mysql-server postgresql libgd-dev libxml2 libxslt1-dev \
     libtidy-dev libreadline6 gettext libfreetype6 git autoconf bison re2c openssl pkg-config libssl-dev \
     libbz2-dev libcurl4-openssl-dev libenchant-dev libgmp-dev libicu-dev libmcrypt-dev \
-    postgresql-server-dev-all libpspell-dev libreadline-dev gnupg wget \
+    postgresql-server-dev-all libpspell-dev libreadline-dev gnupg wget libkrb5-dev libsqlite3-dev \
+    libffi-dev libwebp-dev libonig-dev \
     && rm -rf /var/lib/apt/lists/*
 RUN ln -s /usr/include/x86_64-linux-gnu/gmp.h /usr/include/gmp.h
 
