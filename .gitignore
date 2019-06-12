@@ -1,0 +1,5 @@
+.*.swp
+bin/
+config
+php-src/
+travis-compile-patched.sh
